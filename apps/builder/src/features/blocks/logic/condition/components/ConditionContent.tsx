@@ -92,5 +92,7 @@ const parseComparisonOperatorSymbol = (
       return "matches";
     case ComparisonOperators.NOT_MATCH_REGEX:
       return "not matches";
+    case ComparisonOperators.STRING_SIMILARITY:
+      return "similar to";
   }
 };

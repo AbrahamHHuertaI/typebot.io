@@ -78,5 +78,7 @@ const parseValuePlaceholder = (
     case ComparisonOperators.MATCHES_REGEX:
     case ComparisonOperators.NOT_MATCH_REGEX:
       return "/^[0-9]+$/";
+    case ComparisonOperators.STRING_SIMILARITY:
+      return "Hi|Hello|Hey";
   }
 };

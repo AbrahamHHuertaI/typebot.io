@@ -16,4 +16,5 @@ export enum ComparisonOperators {
   ENDS_WITH = "Ends with",
   MATCHES_REGEX = "Matches regex",
   NOT_MATCH_REGEX = "Does not match regex",
+  STRING_SIMILARITY = "String similarity",
 }

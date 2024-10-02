@@ -156,6 +156,25 @@ const executeComparison =
         };
         return compare(matchesRegex, inputValue, value);
       }
+      case ComparisonOperators.STRING_SIMILARITY: {
+        // example inputValue  Hello
+        // example value  Hi|Hello|Hey
+        // split value by | and compare each value with inputValue
+        let similarity = 0;
+        let maxSimilarity = 0;
+        if (typeof inputValue === "string") {
+          const values = value.split("|");
+          for (const val of values) {
+            similarity = compareStringsBagOfNumbers(inputValue, val);
+            if (similarity > maxSimilarity) {
+              maxSimilarity = similarity;
+            }
+          }
+          return maxSimilarity > 0.5;
+        }else{
+          return false;
+        }
+      }
     }
   };
 
@@ -198,3 +217,63 @@ const preprocessRegex = (regex: string) => {
 
   return { pattern: regex };
 };
+
+
+// string similarity function
+function getBagOfNumbers(str) {
+  const bag = {};
+
+  // Convertimos el string a minúsculas para evitar diferencias por mayúsculas/minúsculas
+  str = str.toLowerCase();
+
+  // Recorremos cada carácter en la cadena
+  for (let char of str) {
+    if (char in bag) {
+      bag[char] += 1; // Si ya existe el carácter en el bag, aumentamos su frecuencia
+    } else {
+      bag[char] = 1; // Si es la primera vez que aparece, lo agregamos con frecuencia 1
+    }
+  }
+
+  return bag;
+}
+
+function compareStringsBagOfNumbers(str1, str2) {
+  const bag1 = getBagOfNumbers(str1);
+  const bag2 = getBagOfNumbers(str2);
+
+  // Usamos un objeto para almacenar todos los caracteres únicos
+  const allChars = {};
+
+  // Agregamos los caracteres de la primera cadena
+  for (let char in bag1) {
+    allChars[char] = true;
+  }
+
+  // Agregamos los caracteres de la segunda cadena
+  for (let char in bag2) {
+    allChars[char] = true;
+  }
+
+  // Creamos vectores para cada cadena basados en la frecuencia de los caracteres
+  const vec1 = [];
+  const vec2 = [];
+
+  for (let char in allChars) {
+    vec1.push(bag1[char] || 0); // Si el carácter no existe en la primera cadena, ponemos un 0
+    vec2.push(bag2[char] || 0); // Si el carácter no existe en la segunda cadena, ponemos un 0
+  }
+
+  // Ahora que tenemos los vectores, calculamos la similitud del coseno entre ellos
+  const dotProduct = vec1.reduce((sum, val, idx) => sum + val * vec2[idx], 0);
+  const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val * val, 0));
+  const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val * val, 0));
+
+  // Si alguna magnitud es 0, significa que uno de los vectores es vacío
+  if (magnitude1 === 0 || magnitude2 === 0) {
+    return 0;
+  }
+
+  // Similaridad del coseno
+  return dotProduct / (magnitude1 * magnitude2);
+}
