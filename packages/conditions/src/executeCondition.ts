@@ -157,31 +157,7 @@ const executeComparison =
         return compare(matchesRegex, inputValue, value);
       }
       case ComparisonOperators.STRING_SIMILARITY: {
-        // example inputValue  Hello
-        // example value  Hi|Hello|Hey
-        // split value by | and compare each value with inputValue
-        let similarity = 0;
-        let maxSimilarity = 0;
-        if (typeof inputValue === "string") {
-          if(value && typeof value === "string"){
-            const values = value.split("|");
-            for (const val of values) {
-              console.log("inputValue", inputValue);
-              console.log("val", val);
-              similarity = compareStringsBagOfNumbers(inputValue, val);
-              console.log("similarity", similarity);
-              if (similarity > maxSimilarity) {
-                maxSimilarity = similarity;
-              }
-            }
-            console.log("maxSimilarity", maxSimilarity);
-            return maxSimilarity > 0.8;
-          }else{
-            return false;
-          }
-        }else{
-          return false;
-        }
+        return compararValores(inputValue as string, value as string);
       }
     }
   };
@@ -227,60 +203,68 @@ const preprocessRegex = (regex: string) => {
 };
 
 
-function getBagOfNumbers(str: string): any {
-  const bag: any = {};
+// Función que calcula la distancia de Levenshtein
+function levenshtein(str1: string, str2: string): number {
+  const m = str1.length;
+  const n = str2.length;
 
-  // Convertimos el string a minúsculas para evitar diferencias por mayúsculas/minúsculas
-  str = str.toLowerCase();
+  // Creamos una matriz vacía (m + 1) x (n + 1)
+  const matrix: number[][] = (<any>Array(m + 1)).fill(null).map(() => (<any>Array(n + 1)).fill(null));
 
-  // Recorremos cada carácter en la cadena
-  for (let char of str) {
-    if (char in bag) {
-      bag[char] += 1; // Si ya existe el carácter en el bag, aumentamos su frecuencia
-    } else {
-      bag[char] = 1; // Si es la primera vez que aparece, lo agregamos con frecuencia 1
-    }
+  // Inicializamos la primera fila y la primera columna
+  for (let i = 0; i <= m; i++) {
+      matrix[i][0] = i;
+  }
+  for (let j = 0; j <= n; j++) {
+      matrix[0][j] = j;
   }
 
-  return bag;
+  // Llenamos la matriz usando el algoritmo de Levenshtein
+  for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+          const costoSustitucion = str1[i - 1] === str2[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(
+              matrix[i - 1][j] + 1, // Eliminación
+              matrix[i][j - 1] + 1, // Inserción
+              matrix[i - 1][j - 1] + costoSustitucion // Sustitución
+          );
+      }
+  }
+
+  // El valor en la esquina inferior derecha es la distancia de Levenshtein
+  return matrix[m][n];
 }
 
+// Función que calcula la similitud basada en la distancia de Levenshtein
 function compareStringsBagOfNumbers(str1: string, str2: string): number {
-  const bag1: any = getBagOfNumbers(str1);
-  const bag2: any = getBagOfNumbers(str2);
+  const distancia = levenshtein(str1, str2);
+  const maxLength = Math.max(str1.length, str2.length);
+  return (maxLength - distancia) / maxLength;
+}
 
-  // Usamos un objeto para almacenar todos los caracteres únicos
-  const allChars: any = {};
+// Implementación del operador de comparación
+function compararValores(inputValue: string, value: string): boolean {
+  let similarity = 0;
+  let maxSimilarity = 0;
 
-  // Agregamos los caracteres de la primera cadena
-  for (let char in bag1) {
-    allChars[char] = true;
+  if (typeof inputValue === "string") {
+      if (value && typeof value === "string") {
+          const values = value.split("|");
+          for (const val of values) {
+              console.log("inputValue:", inputValue);
+              console.log("val:", val);
+              similarity = compareStringsBagOfNumbers(inputValue, val);
+              console.log("similarity:", similarity);
+              if (similarity > maxSimilarity) {
+                  maxSimilarity = similarity;
+              }
+          }
+          console.log("maxSimilarity:", maxSimilarity);
+          return maxSimilarity > 0.8;
+      } else {
+          return false;
+      }
+  } else {
+      return false;
   }
-
-  // Agregamos los caracteres de la segunda cadena
-  for (let char in bag2) {
-    allChars[char] = true;
-  }
-
-  // Creamos vectores para cada cadena basados en la frecuencia de los caracteres
-  const vec1: number[] = [];
-  const vec2: number[] = [];
-
-  for (let char in allChars) {
-    vec1.push(bag1[char] || 0); // Si el carácter no existe en la primera cadena, ponemos un 0
-    vec2.push(bag2[char] || 0); // Si el carácter no existe en la segunda cadena, ponemos un 0
-  }
-
-  // Ahora que tenemos los vectores, calculamos la similitud del coseno entre ellos
-  const dotProduct: number = vec1.reduce((sum: any, val: any, idx: any) => sum + val * vec2[idx], 0);
-  const magnitude1: number = Math.sqrt(vec1.reduce((sum: any, val: any) => sum + val * val, 0));
-  const magnitude2: number = Math.sqrt(vec2.reduce((sum: any, val: any) => sum + val * val, 0));
-
-  // Si alguna magnitud es 0, significa que uno de los vectores es vacío
-  if (magnitude1 === 0 || magnitude2 === 0) {
-    return 0;
-  }
-
-  // Similaridad del coseno
-  return dotProduct / (magnitude1 * magnitude2);
 }
