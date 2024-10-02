@@ -166,11 +166,15 @@ const executeComparison =
           if(value && typeof value === "string"){
             const values = value.split("|");
             for (const val of values) {
+              console.log("inputValue", inputValue);
+              console.log("val", val);
               similarity = compareStringsBagOfNumbers(inputValue, val);
+              console.log("similarity", similarity);
               if (similarity > maxSimilarity) {
                 maxSimilarity = similarity;
               }
             }
+            console.log("maxSimilarity", maxSimilarity);
             return maxSimilarity > 0.8;
           }else{
             return false;
