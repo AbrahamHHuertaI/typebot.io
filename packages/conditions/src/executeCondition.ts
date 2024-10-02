@@ -171,7 +171,7 @@ const executeComparison =
                 maxSimilarity = similarity;
               }
             }
-            return maxSimilarity > 0.5;
+            return maxSimilarity > 0.8;
           }else{
             return false;
           }
