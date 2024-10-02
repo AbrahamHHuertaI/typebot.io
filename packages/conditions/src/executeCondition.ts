@@ -223,9 +223,8 @@ const preprocessRegex = (regex: string) => {
 };
 
 
-// string similarity function
-function getBagOfNumbers(str) {
-  const bag = {};
+function getBagOfNumbers(str: string): any {
+  const bag: any = {};
 
   // Convertimos el string a minúsculas para evitar diferencias por mayúsculas/minúsculas
   str = str.toLowerCase();
@@ -242,12 +241,12 @@ function getBagOfNumbers(str) {
   return bag;
 }
 
-function compareStringsBagOfNumbers(str1, str2) {
-  const bag1 = getBagOfNumbers(str1);
-  const bag2 = getBagOfNumbers(str2);
+function compareStringsBagOfNumbers(str1: string, str2: string): number {
+  const bag1: any = getBagOfNumbers(str1);
+  const bag2: any = getBagOfNumbers(str2);
 
   // Usamos un objeto para almacenar todos los caracteres únicos
-  const allChars = {};
+  const allChars: any = {};
 
   // Agregamos los caracteres de la primera cadena
   for (let char in bag1) {
@@ -260,8 +259,8 @@ function compareStringsBagOfNumbers(str1, str2) {
   }
 
   // Creamos vectores para cada cadena basados en la frecuencia de los caracteres
-  const vec1 = [];
-  const vec2 = [];
+  const vec1: number[] = [];
+  const vec2: number[] = [];
 
   for (let char in allChars) {
     vec1.push(bag1[char] || 0); // Si el carácter no existe en la primera cadena, ponemos un 0
@@ -269,9 +268,9 @@ function compareStringsBagOfNumbers(str1, str2) {
   }
 
   // Ahora que tenemos los vectores, calculamos la similitud del coseno entre ellos
-  const dotProduct = vec1.reduce((sum, val, idx) => sum + val * vec2[idx], 0);
-  const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val * val, 0));
-  const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val * val, 0));
+  const dotProduct: number = vec1.reduce((sum: any, val: any, idx: any) => sum + val * vec2[idx], 0);
+  const magnitude1: number = Math.sqrt(vec1.reduce((sum: any, val: any) => sum + val * val, 0));
+  const magnitude2: number = Math.sqrt(vec2.reduce((sum: any, val: any) => sum + val * val, 0));
 
   // Si alguna magnitud es 0, significa que uno de los vectores es vacío
   if (magnitude1 === 0 || magnitude2 === 0) {
