@@ -163,14 +163,18 @@ const executeComparison =
         let similarity = 0;
         let maxSimilarity = 0;
         if (typeof inputValue === "string") {
-          const values = value.split("|");
-          for (const val of values) {
-            similarity = compareStringsBagOfNumbers(inputValue, val);
-            if (similarity > maxSimilarity) {
-              maxSimilarity = similarity;
+          if(value && typeof value === "string"){
+            const values = value.split("|");
+            for (const val of values) {
+              similarity = compareStringsBagOfNumbers(inputValue, val);
+              if (similarity > maxSimilarity) {
+                maxSimilarity = similarity;
+              }
             }
+            return maxSimilarity > 0.5;
+          }else{
+            return false;
           }
-          return maxSimilarity > 0.5;
         }else{
           return false;
         }
