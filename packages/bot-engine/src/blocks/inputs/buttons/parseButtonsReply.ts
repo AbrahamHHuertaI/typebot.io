@@ -18,10 +18,10 @@ export const parseButtonsReply =
       }>(
         (acc, item) => {
           if (
-            item.content &&
-            acc.strippedInput
+            removeSpecialChars(item.content) &&
+            removeSpecialChars(acc.strippedInput)
               .toLowerCase()
-              .includes(item.content.trim().toLowerCase())
+              .includes(removeSpecialChars(item.content).trim().toLowerCase())
           )
             return {
               strippedInput: acc.strippedInput.replace(item.content ?? "", ""),
@@ -80,3 +80,8 @@ export const parseButtonsReply =
       reply: matchedItem.content ?? "",
     };
   };
+  function removeSpecialChars(text: string): string {
+    // Expresión regular para eliminar emojis, caracteres especiales y �
+    return text.replace(/[^a-zA-Z0-9.,!? ]/g, "");
+  }
+  
