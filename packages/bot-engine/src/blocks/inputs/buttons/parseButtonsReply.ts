@@ -81,8 +81,10 @@ export const parseButtonsReply =
     };
   };
   function removeSpecialChars(text?: string): string {
+    // Si el texto es undefined o null, devolver un string vacío
+    if (!text) return "";
+    
     // Expresión regular para eliminar emojis, caracteres especiales y �
-    if(!text) return text;
-    return text?.replace(/[^a-zA-Z0-9.,!? ]/g, "");
+    return text.replace(/[^a-zA-Z0-9.,!? ]/g, "");
   }
   
