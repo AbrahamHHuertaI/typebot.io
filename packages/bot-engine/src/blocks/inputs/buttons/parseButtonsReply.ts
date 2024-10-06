@@ -71,8 +71,8 @@ export const parseButtonsReply =
     );
     const matchedItem = longestItemsFirst.find(
       (item) =>
-        item.id === inputValue ||
-        (item.content && inputValue.trim() === item.content.trim()),
+        item.id === removeSpecialChars(inputValue) ||
+        (removeSpecialChars(item.content) && removeSpecialChars(inputValue).trim() === removeSpecialChars(item.content).trim()),
     );
     if (!matchedItem) return { status: "fail" };
     return {
@@ -81,9 +81,10 @@ export const parseButtonsReply =
     };
   };
   function removeSpecialChars(text?: string): string {
+    console.log("text", text);
     // Si el texto es undefined o null, devolver un string vacío
     if (!text) return "";
-    
+    console.log("text", text.replace(/[^a-zA-Z0-9.,!? ]/g, ""));
     // Expresión regular para eliminar emojis, caracteres especiales y �
     return text.replace(/[^a-zA-Z0-9.,!? ]/g, "");
   }
