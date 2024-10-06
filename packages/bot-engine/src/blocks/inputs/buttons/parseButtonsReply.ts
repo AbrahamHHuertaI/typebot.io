@@ -80,7 +80,7 @@ export const parseButtonsReply =
       reply: matchedItem.content ?? "",
     };
   };
-  function removeSpecialChars(text: string): string {
+  function removeSpecialChars(text?: string): string {
     // Expresión regular para eliminar emojis, caracteres especiales y �
     return text.replace(/[^a-zA-Z0-9.,!? ]/g, "");
   }
